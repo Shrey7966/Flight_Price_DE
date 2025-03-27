@@ -47,7 +47,7 @@ if response.status_code == 200:
 
     ## Upload file to AWS S3
     s3 = boto3.client("s3")
-    BUCKET_NAME = "flight-price-analysis-project"
+    BUCKET_NAME = "flight-price-etl-github"
 
     try:
         s3.upload_file(file_path, BUCKET_NAME, f"{depart_date}.json")
