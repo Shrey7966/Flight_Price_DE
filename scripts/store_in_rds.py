@@ -9,6 +9,12 @@ spark = SparkSession.builder \
     .config("spark.hadoop.fs.s3.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem") \
     .config("spark.jars.packages", "org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262") \
     .getOrCreate()
+
+spark._jsc.hadoopConfiguration().set("fs.s3a.access.key", "<AWS_ACCESS_KEY_ID>")
+spark._jsc.hadoopConfiguration().set("fs.s3a.secret.key", "<AWS_SECRET_ACCESS_KEY>")
+spark._jsc.hadoopConfiguration().set("fs.s3a.endpoint", "s3.amazonaws.com")
+
+
 df_post = spark.read.csv("s3a://flight-price-etl-github/flight_prices_test.csv/", header=True, inferSchema=True)
 
 # Convert to Pandas DataFrame for PostgreSQL storage
