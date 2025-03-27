@@ -2,6 +2,8 @@ import re
 import psycopg2
 from pyspark.sql.functions import *
 
+
+spark = SparkSession.builder.appName("connectToRDS").getOrCreate()
 df_post = spark.read.csv("s3://flight-price-etl-github/flight_prices_test.csv/", header=True, inferSchema=True)
 
 # Convert to Pandas DataFrame for PostgreSQL storage
