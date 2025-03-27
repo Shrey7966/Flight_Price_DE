@@ -10,8 +10,8 @@ spark = SparkSession.builder \
     .config("spark.jars.packages", "org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262") \
     .getOrCreate()
 
-spark._jsc.hadoopConfiguration().set("fs.s3a.access.key", "<AWS_ACCESS_KEY_ID>")
-spark._jsc.hadoopConfiguration().set("fs.s3a.secret.key", "<AWS_SECRET_ACCESS_KEY>")
+spark._jsc.hadoopConfiguration().set("fs.s3a.access.key", "AWS_ACCESS_KEY_ID")
+spark._jsc.hadoopConfiguration().set("fs.s3a.secret.key", "AWS_SECRET_ACCESS_KEY")
 spark._jsc.hadoopConfiguration().set("fs.s3a.endpoint", "s3.amazonaws.com")
 
 
