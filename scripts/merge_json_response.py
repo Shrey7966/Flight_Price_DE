@@ -47,3 +47,6 @@ if dfs:
     flight_data.show()  # Show sample data
 else:
     print(" No valid data found in S3.")
+
+
+flight_data.coalesce(1).write.mode("overwrite").json("s3://flight-price-etl-github/merged-flight-data")
