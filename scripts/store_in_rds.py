@@ -1,5 +1,6 @@
 import re
 import psycopg2
+from pyspark.sql.functions import *
 
 df_post = spark.read.csv("s3://flight-price-etl-github/flight_prices_test.csv/", header=True, inferSchema=True)
 
