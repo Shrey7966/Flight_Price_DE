@@ -11,12 +11,12 @@ headers = {
     }
 
  # Fetch date (when we are collecting data)
-    fetch_date = datetime.today().strftime('%Y-%m-%d')
+fetch_date = datetime.today().strftime('%Y-%m-%d')
 
     # Depart date (when the flight is scheduled)
-    depart_date = "2025-05-31"
+depart_date = "2025-05-31"
 
-    params = {
+params = {
         "fromEntityId": "BLR",
         "toEntityId": "JFK",
         "departDate": depart_date,
@@ -24,7 +24,6 @@ headers = {
         "cabinClass": "economy",
         "stops":"direct,1stop,2stops"
     }
-
 
 response = requests.get(API_URL, headers=headers, params=params)
 if response.status_code == 200:
