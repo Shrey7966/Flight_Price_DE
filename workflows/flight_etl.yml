@@ -19,7 +19,7 @@ jobs:
         python-version: "3.9"
 
     - name: Install Dependencies
-      run: pip install requests boto3 psycopg2 pandas pyarrow
+      run: pip install requests boto3 psycopg2 pandas pyarrow **pyspark**
 
     - name: Fetch Flight Price Data
       run: python scripts/fetch_flight_data.py  
@@ -30,14 +30,7 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: python scripts/upload_to_s3.py  
 
-    - name: Process Data in Databricks
-      env:
-        DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-        DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
-      run: |
-        databricks jobs run-now --job-id YOUR_JOB_ID  
-
-    - name: Store Processed Data in AWS RDS
+    - name: Process & Store in AWS RDS
       env:
         PG_HOST: ${{ secrets.PG_HOST }}
         PG_DB: ${{ secrets.PG_DB }}
