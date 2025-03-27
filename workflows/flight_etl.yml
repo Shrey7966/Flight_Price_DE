@@ -1,0 +1,46 @@
+name: Flight Price ETL Pipeline
+
+on:
+  schedule:
+    - cron: '30 17 * * *'  # Runs daily at 5:30 PM GMT
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  fetch-process-store:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v3
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.9"
+
+    - name: Install Dependencies
+      run: pip install requests boto3 psycopg2 pandas pyarrow
+
+    - name: Fetch Flight Price Data
+      run: python scripts/fetch_flight_data.py  
+
+    - name: Upload to AWS S3
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      run: python scripts/upload_to_s3.py  
+
+    - name: Process Data in Databricks
+      env:
+        DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+        DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+      run: |
+        databricks jobs run-now --job-id YOUR_JOB_ID  
+
+    - name: Store Processed Data in AWS RDS
+      env:
+        PG_HOST: ${{ secrets.PG_HOST }}
+        PG_DB: ${{ secrets.PG_DB }}
+        PG_USER: ${{ secrets.PG_USER }}
+        PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
+      run: python scripts/store_in_rds.py  
