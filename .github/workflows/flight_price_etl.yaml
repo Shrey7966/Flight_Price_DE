@@ -19,7 +19,7 @@ jobs:
         python-version: "3.9"
 
     - name: Install Dependencies
-      run: pip install requests boto3 psycopg2 pandas pyarrow **pyspark**
+      run: pip install requests boto3 psycopg2 pandas pyarrow pyspark
 
     - name: Fetch Flight Price Data
       run: python scripts/fetch_flight_data.py  
