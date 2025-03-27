@@ -4,8 +4,12 @@ from pyspark.sql.functions import *
 from pyspark.sql import SparkSession
 
 
-spark = SparkSession.builder.appName("connectToRDS").getOrCreate()
-df_post = spark.read.csv("s3://flight-price-etl-github/flight_prices_test.csv/", header=True, inferSchema=True)
+spark = SparkSession.builder \
+    .appName("Store Flight Data in RDS") \
+    .config("spark.hadoop.fs.s3.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem") \
+    .config("spark.jars.packages", "org.apache.hadoop:hadoop-aws:3.3.4,com.amazonaws:aws-java-sdk-bundle:1.12.262") \
+    .getOrCreate()
+df_post = spark.read.csv("s3a://flight-price-etl-github/flight_prices_test.csv/", header=True, inferSchema=True)
 
 # Convert to Pandas DataFrame for PostgreSQL storage
 pandas_df = df_post.toPandas()
