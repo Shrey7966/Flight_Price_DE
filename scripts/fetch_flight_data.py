@@ -1,6 +1,7 @@
 import requests
 import json
 from datetime import datetime,timedelta
+import boto3
 
 API_URL = "https://flights-sky.p.rapidapi.com/flights/search-one-way"
 API_KEY = "fdcf5105b0mshb60125cb25ee57ep1565acjsndd740fc93e14"
@@ -33,3 +34,12 @@ if response.status_code == 200:
     print("Flight price data fetched successfully.")
 else:
     print(f" API request failed: {response.status_code} - {response.text}")
+
+## uploading file to s3
+
+s3 = boto3.client("s3")
+BUCKET_NAME = "flight-price-analysis-project"
+
+s3.upload_file(f"flight_prices_latest/{fetch_date}/{depart_date}.json", BUCKET_NAME, f"{depart_date}.json")
+print("Data uploaded to S3 successfully.")
+
