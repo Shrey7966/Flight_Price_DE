@@ -10,7 +10,7 @@ s3 = boto3.client("s3")
 
 # S3 bucket and prefix
 s3_bucket = "flight-price-etl-github"
-s3_prefix = "data/flight_prices/"  # --> Folder containing all fetch dates
+s3_prefix = f"flight_prices_latest/{fetch_date}/{depart_date}.json"  # --> Folder containing all fetch dates
 
 # List all fetch dates available in S3
 response = s3.list_objects_v2(Bucket=s3_bucket, Prefix=s3_prefix, Delimiter='/')
