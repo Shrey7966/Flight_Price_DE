@@ -2,6 +2,7 @@ import re
 import psycopg2
 from pyspark.sql.functions import *
 from pyspark.sql import SparkSession
+import os
 
 
 spark = SparkSession.builder \
