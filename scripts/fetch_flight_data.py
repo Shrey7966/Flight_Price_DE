@@ -33,17 +33,18 @@ response = requests.get(API_URL, headers=headers, params=params)
 
 if response.status_code == 200:
     data = response.json()
+    print(f"✅ API response received successfully. Data size: {len(data)} entries.")
 
     # Ensure directory exists
     output_dir = f"flight_prices_latest/{fetch_date}"
     os.makedirs(output_dir, exist_ok=True)
+    print(f"✅ Directory created: {output_dir}")
 
     # Save JSON file
     file_path = f"{output_dir}/{depart_date}.json"
     with open(file_path, "w") as f:
         json.dump(data, f)
-
-    print("Flight price data fetched successfully.")
+    print(f"✅ Data saved locally at {file_path}")
 
     ## Upload file to AWS S3
     s3 = boto3.client("s3")
@@ -51,10 +52,9 @@ if response.status_code == 200:
 
     try:
         s3.upload_file(file_path, BUCKET_NAME, f"{depart_date}.json")
-        print(" Data uploaded to S3 successfully.")
+        print("✅ Data uploaded to S3 successfully.")
     except Exception as e:
-        print(f" Failed to upload to S3: {str(e)}")
+        print(f"❌ Failed to upload to S3: {str(e)}")
 
 else:
-    print(f" API request failed: {response.status_code} - {response.text}")
-
+    print(f"❌ API request failed: {response.status_code} - {response.text}")
