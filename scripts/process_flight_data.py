@@ -17,7 +17,8 @@ aws_secret_key = os.getenv("AWS_SECRET_ACCESS_KEY")
 
 
 spark = SparkSession.builder \
-    .appName("Flight Price Processing") \
+    .appName("FlightPriceAnalysis") \
+    .config("spark.jars", "jars/hadoop-aws-3.3.4.jar,jars/aws-java-sdk-bundle-1.12.262.jar") \
     .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem") \
     .config("spark.hadoop.fs.s3a.access.key", aws_access_key) \
     .config("spark.hadoop.fs.s3a.secret.key", aws_secret_key) \
