@@ -28,7 +28,7 @@ spark = SparkSession.builder \
     .config("spark.hadoop.fs.s3a.endpoint", "s3.amazonaws.com") \
     .getOrCreate()
 
-df = spark.read.option("multiline", "true").json("s3a://your-bucket/raw_flight_data/")
+df = spark.read.option("multiline", "true").json("s3a:/flight-price-db-github/raw_flight_data/")
 
 
 def process_flight_data():
