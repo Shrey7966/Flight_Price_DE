@@ -1,0 +1,6 @@
+boto3
+requests
+pandas
+pyspark
+sqlalchemy
+psycopg2-binary
