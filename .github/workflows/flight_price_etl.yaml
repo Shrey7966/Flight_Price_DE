@@ -25,10 +25,10 @@ jobs:
     
       - name: Set up Hadoop and AWS JARs
         run: |
-            mkdir -p jars
-            wget -P jars https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.3.4/hadoop-aws-3.3.4.jar
-            wget -P jars https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.12.262/aws-java-sdk-bundle-1.12.262.jar
-
+          mkdir -p $GITHUB_WORKSPACE/jars
+          wget -P $GITHUB_WORKSPACE/jars https://repo1.maven.org/maven2/org/apache/hadoop/hadoop-aws/3.3.4/hadoop-aws-3.3.4.jar
+          wget -P $GITHUB_WORKSPACE/jars https://repo1.maven.org/maven2/com/amazonaws/aws-java-sdk-bundle/1.12.262/aws-java-sdk-bundle-1.12.262.jar
+     
       - name: Set PySpark environment variables
         run: |
             echo "PYSPARK_SUBMIT_ARGS=--jars $(pwd)/jars/hadoop-aws-3.3.4.jar,$(pwd)/jars/aws-java-sdk-bundle-1.12.262.jar pyspark-shell" >> $GITHUB_ENV
