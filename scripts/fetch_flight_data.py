@@ -1,60 +1,43 @@
-import os
 import requests
-import json
-from datetime import datetime
 import boto3
+import json
+import os
+from datetime import datetime
 
-# Flight API details
-API_URL = "https://flights-sky.p.rapidapi.com/flights/search-one-way"
-API_KEY = "fdcf5105b0mshb60125cb25ee57ep1565acjsndd740fc93e14"
-headers = {
-    "x-rapidapi-key": API_KEY,
-    "x-rapidapi-host": "flights-sky.p.rapidapi.com"
-}
+# Environment Variables
+API_URL = os.getenv("FLIGHTS_API_URL")
+API_KEY = os.getenv("FLIGHTS_API_KEY")
+S3_BUCKET = os.getenv("S3_BUCKET")
+S3_FOLDER = "raw_flight_data/"
 
-# Fetch date (when we are collecting data)
-fetch_date = datetime.today().strftime('%Y-%m-%d')
+# Initialize S3 Client
+s3 = boto3.client("s3")
 
-# Depart date (when the flight is scheduled)
-depart_date = "2025-05-31"
+def fetch_flight_data():
+    url = "https://flights-sky.p.rapidapi.com/flights/search-one-way"
+    
+    querystring = {"fromEntityId":"BLR","toEntityId":"DFW","departDate":"2025-05-31","market":"IN","locale":"en-US","currency":"INR","stops":"direct,1stop,2stops","cabinClass":"economy"}
+    
+    headers = {
+    	"x-rapidapi-key": "fdcf5105b0mshb60125cb25ee57ep1565acjsndd740fc93e14",
+    	"x-rapidapi-host": "flights-sky.p.rapidapi.com"
+    }
+    
+    response = requests.get(url, headers=headers, params=querystring)
+    
+    if response.status_code == 200:
+        data = response.json()
+        timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+        file_name = f"flight_prices_{timestamp}.json"
 
-# Request parameters
-params = {
-    "fromEntityId": "BLR",
-    "toEntityId": "JFK",
-    "departDate": depart_date,
-    "currency": "INR",
-    "cabinClass": "economy",
-    "stops": "direct,1stop,2stops"
-}
+        s3.put_object(
+            Bucket=S3_BUCKET,
+            Key=S3_FOLDER + file_name,
+            Body=json.dumps(data)
+        )
+        print(f"✅ Data saved to S3: {file_name}")
+    else:
+        print(f"❌ Failed to fetch data: {response.status_code}")
 
-# API request
-response = requests.get(API_URL, headers=headers, params=params)
-
-if response.status_code == 200:
-    data = response.json()
-    print(f"✅ API response received successfully. Data size: {len(data)} entries.")
-
-    # Ensure directory exists
-    output_dir = f"flight_prices_latest/{fetch_date}"
-    os.makedirs(output_dir, exist_ok=True)
-    print(f"✅ Directory created: {output_dir}")
-
-    # Save JSON file
-    file_path = f"{output_dir}/{depart_date}.json"
-    with open(file_path, "w") as f:
-        json.dump(data, f)
-    print(f"✅ Data saved locally at {file_path}")
-
-    ## Upload file to AWS S3
-    s3 = boto3.client("s3")
-    BUCKET_NAME = "flight-price-etl-github"
-
-    try:
-        s3.upload_file(file_path, BUCKET_NAME, f"{depart_date}.json")
-        print("✅ Data uploaded to S3 successfully.")
-    except Exception as e:
-        print(f"❌ Failed to upload to S3: {str(e)}")
-
-else:
-    print(f"❌ API request failed: {response.status_code} - {response.text}")
+if __name__ == "__main__":
+    fetch_flight_data()
