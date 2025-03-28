@@ -16,9 +16,12 @@ aws_access_key = os.getenv("AWS_ACCESS_KEY_ID")
 aws_secret_key = os.getenv("AWS_SECRET_ACCESS_KEY")
 
 
+#Get JAR directory from GitHub Actions workspace
+jar_dir = os.getenv("GITHUB_WORKSPACE", ".") + "/jars"
+
 spark = SparkSession.builder \
     .appName("FlightPriceAnalysis") \
-    .config("spark.jars", "jars/hadoop-aws-3.3.4.jar,jars/aws-java-sdk-bundle-1.12.262.jar") \
+    .config("spark.jars", f"{jar_dir}/hadoop-aws-3.3.4.jar,{jar_dir}/aws-java-sdk-bundle-1.12.262.jar") \
     .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem") \
     .config("spark.hadoop.fs.s3a.access.key", aws_access_key) \
     .config("spark.hadoop.fs.s3a.secret.key", aws_secret_key) \
