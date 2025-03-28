@@ -8,9 +8,24 @@ S3_BUCKET = os.getenv("S3_BUCKET")
 RAW_FOLDER = "raw_flight_data/"
 PROCESSED_FOLDER = "processed_flight_data/"
 
-# Initialize Spark
-spark = SparkSession.builder.appName("FlightDataProcessing").getOrCreate()
+
 s3 = boto3.client("s3")
+# Initialize Spark
+# Get AWS credentials from environment variables
+aws_access_key = os.getenv("AWS_ACCESS_KEY_ID")
+aws_secret_key = os.getenv("AWS_SECRET_ACCESS_KEY")
+
+
+spark = SparkSession.builder \
+    .appName("Flight Price Processing") \
+    .config("spark.hadoop.fs.s3a.impl", "org.apache.hadoop.fs.s3a.S3AFileSystem") \
+    .config("spark.hadoop.fs.s3a.access.key", aws_access_key) \
+    .config("spark.hadoop.fs.s3a.secret.key", aws_secret_key) \
+    .config("spark.hadoop.fs.s3a.endpoint", "s3.amazonaws.com") \
+    .getOrCreate()
+
+df = spark.read.option("multiline", "true").json("s3a://your-bucket/raw_flight_data/")
+
 
 def process_flight_data():
     # List all JSON files in the raw folder
