@@ -24,7 +24,6 @@ jobs:
         run: python scripts/fetch_flight_data.py
         env:
           FLIGHTS_API_URL: ${{ secrets.FLIGHTS_API_URL }}
-          FLIGHTS_API_KEY: ${{ secrets.FLIGHTS_API_KEY }}
           S3_BUCKET: ${{ secrets.S3_BUCKET }}
 
       - name: Process Flight Price Data
