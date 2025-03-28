@@ -83,4 +83,4 @@ df_final = df_grouped.select(
     "marketingCarrier", "operatingCarrier", "origin", "destination", "layover", "numStops"
 )
 
-df_final.write.mode("overwrite").csv("s3://flightpriceanalysisproject/flight_prices_test.csv", header=True)
+df_final.write.mode("overwrite").csv("s3://flight-price-etl-github/flight_prices_test.csv", header=True)
