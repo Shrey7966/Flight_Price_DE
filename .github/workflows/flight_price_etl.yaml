@@ -2,42 +2,41 @@ name: Flight Price ETL Pipeline
 
 on:
   schedule:
-    - cron: '30 17 * * *'  # Runs daily at 5:30 PM GMT
+    - cron: "30 17 * * *"  # Runs daily at 5:30 PM GMT
   workflow_dispatch:  # Allows manual trigger
 
 jobs:
-  fetch-process-store:
+  flight_etl:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout Repo
-      uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.9"
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
 
-    - name: Install Dependencies
-      run: pip install requests boto3 psycopg2 pandas pyarrow pyspark
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
 
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: eu-north-1  # Change to your region
+      - name: Fetch Flight Price Data
+        run: python scripts/fetch_flight_data.py
+        env:
+          FLIGHTS_API_URL: ${{ secrets.FLIGHTS_API_URL }}
+          FLIGHTS_API_KEY: ${{ secrets.FLIGHTS_API_KEY }}
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
 
-    - name: Fetch Flight Price Data
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      run: python scripts/fetch_flight_data.py  
+      - name: Process Flight Price Data
+        run: python scripts/process_flight_data.py
+        env:
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
 
-    - name: Process & Store in AWS RDS
-      env:
-        PG_HOST: ${{ secrets.PG_HOST }}
-        PG_DB: ${{ secrets.PG_DB }}
-        PG_USER: ${{ secrets.PG_USER }}
-        PG_PASSWORD: ${{ secrets.PG_PASSWORD }}
-      run: python scripts/store_in_rds.py  
+      - name: Store Flight Price Data in RDS
+        run: python scripts/store_flight_data.py
+        env:
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASS: ${{ secrets.DB_PASS }}
+          S3_BUCKET: ${{ secrets.S3_BUCKET }}
